@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { WorkLocation } from '@/types';
 
 const DAYS_OF_WEEK = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+const DAYS_OF_WEEK_SHORT = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
 const MONTHS = [
   'January', 'February', 'March', 'April', 'May', 'June',
   'July', 'August', 'September', 'October', 'November', 'December'
@@ -51,21 +52,6 @@ function getWorkLocation(year: number, month: number, day: number): WorkLocation
   return null;
 }
 
-function getDayClass(location: WorkLocation): string {
-  switch (location) {
-    case 'home':
-      return 'day-home';
-    case 'office':
-      return 'day-office';
-    case 'holiday':
-      return 'day-holiday';
-    case 'leave':
-      return 'day-leave';
-    default:
-      return '';
-  }
-}
-
 export default function MonthlyCalendar() {
   const today = new Date();
   const [currentMonth, setCurrentMonth] = useState(today.getMonth());
@@ -110,44 +96,48 @@ export default function MonthlyCalendar() {
   }
 
   return (
-    <div className="card p-6">
-      <div className="flex items-center justify-between mb-6">
-        <h2 className="text-xl font-semibold">Monthly Schedule</h2>
-        <div className="flex items-center gap-4">
+    <div className="card p-3 md:p-4 h-full flex flex-col">
+      {/* Header */}
+      <div className="flex items-center justify-between mb-2 shrink-0">
+        <h2 className="text-base md:text-lg font-semibold">Monthly Schedule</h2>
+        <div className="flex items-center gap-2 md:gap-3">
           <button
             onClick={() => navigateMonth('prev')}
-            className="p-2 hover:bg-[var(--card-border)] rounded-lg transition-colors"
+            className="p-1.5 hover:bg-[var(--card-border)] rounded-lg transition-colors"
           >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
             </svg>
           </button>
-          <span className="text-lg font-medium min-w-[160px] text-center">
+          <span className="text-sm md:text-base font-medium min-w-[120px] md:min-w-[140px] text-center">
             {MONTHS[currentMonth]} {currentYear}
           </span>
           <button
             onClick={() => navigateMonth('next')}
-            className="p-2 hover:bg-[var(--card-border)] rounded-lg transition-colors"
+            className="p-1.5 hover:bg-[var(--card-border)] rounded-lg transition-colors"
           >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
             </svg>
           </button>
         </div>
       </div>
 
-      <div className="grid grid-cols-7 gap-1 mb-2">
-        {DAYS_OF_WEEK.map((day) => (
-          <div key={day} className="text-center text-sm text-gray-400 py-2">
-            {day}
+      {/* Day headers */}
+      <div className="grid grid-cols-7 gap-0.5 md:gap-1 shrink-0">
+        {DAYS_OF_WEEK.map((day, i) => (
+          <div key={day} className="text-center text-xs text-gray-400 py-1">
+            <span className="hidden md:inline">{day}</span>
+            <span className="md:hidden">{DAYS_OF_WEEK_SHORT[i]}</span>
           </div>
         ))}
       </div>
 
-      <div className="grid grid-cols-7 gap-1">
+      {/* Calendar grid */}
+      <div className="grid grid-cols-7 gap-0.5 md:gap-1 flex-1 min-h-0">
         {days.map((day, index) => {
           if (day === null) {
-            return <div key={`empty-${index}`} className="aspect-square p-1 border border-[var(--card-border)]" />;
+            return <div key={`empty-${index}`} className="border border-[var(--card-border)] rounded" />;
           }
 
           const location = getWorkLocation(currentYear, currentMonth, day);
@@ -159,20 +149,17 @@ export default function MonthlyCalendar() {
           return (
             <div
               key={day}
-              className={`aspect-square flex flex-col items-center p-1 rounded-lg text-sm
-                border border-[var(--card-border)] transition-colors hover:bg-[var(--card-border)]
+              className={`flex flex-col p-1 rounded border border-[var(--card-border)] transition-colors hover:bg-[var(--card-border)]
                 ${isToday ? 'ring-2 ring-white ring-opacity-50' : ''}`}
             >
-              <span className={`text-xs ${location ? '' : 'text-gray-600'}`}>{day}</span>
+              <span className={`text-[10px] md:text-xs ${location ? '' : 'text-gray-600'}`}>{day}</span>
               {location && (
                 <div
-                  className={`mt-auto mb-1 px-1.5 py-0.5 rounded text-[10px] font-medium truncate w-full text-center
+                  className={`mt-auto px-1 py-0.5 rounded text-[9px] md:text-[10px] font-medium w-full text-center truncate
                     ${location === 'office' ? 'bg-[var(--accent-office)] text-white' : ''}
-                    ${location === 'home' ? 'bg-[var(--accent-home)] text-white' : ''}
-                    ${location === 'holiday' ? 'bg-[var(--accent-holiday)] text-white' : ''}
-                    ${location === 'leave' ? 'bg-[var(--accent-leave)] text-white' : ''}`}
+                    ${location === 'home' ? 'bg-[var(--accent-home)] text-white' : ''}`}
                 >
-                  {location === 'office' ? 'Office' : location === 'home' ? 'WFH' : location}
+                  {location === 'office' ? 'Office' : 'WFH'}
                 </div>
               )}
             </div>
@@ -180,29 +167,31 @@ export default function MonthlyCalendar() {
         })}
       </div>
 
-      <div className="flex gap-4 mt-6 pt-4 border-t border-[var(--card-border)]">
-        <div className="flex-1 p-3 rounded-lg bg-[var(--accent-office)]">
-          <div className="text-2xl font-bold text-white">{wfoCount}</div>
-          <div className="text-sm text-white/80">Office days</div>
+      {/* Summary */}
+      <div className="flex gap-2 md:gap-3 mt-2 pt-2 border-t border-[var(--card-border)] shrink-0">
+        <div className="flex-1 p-2 rounded-lg bg-[var(--accent-office)]">
+          <div className="text-lg md:text-xl font-bold text-white">{wfoCount}</div>
+          <div className="text-[10px] md:text-xs text-white/80">Office</div>
         </div>
-        <div className="flex-1 p-3 rounded-lg bg-[var(--accent-home)]">
-          <div className="text-2xl font-bold text-white">{wfhCount}</div>
-          <div className="text-sm text-white/80">WFH days</div>
+        <div className="flex-1 p-2 rounded-lg bg-[var(--accent-home)]">
+          <div className="text-lg md:text-xl font-bold text-white">{wfhCount}</div>
+          <div className="text-[10px] md:text-xs text-white/80">WFH</div>
         </div>
-        <div className="flex-1 p-3 rounded-lg bg-[var(--card-border)]">
-          <div className="text-2xl font-bold text-white">{wfoCount + wfhCount}</div>
-          <div className="text-sm text-white/80">Total work days</div>
+        <div className="flex-1 p-2 rounded-lg bg-[var(--card-border)]">
+          <div className="text-lg md:text-xl font-bold text-white">{wfoCount + wfhCount}</div>
+          <div className="text-[10px] md:text-xs text-white/80">Total</div>
         </div>
       </div>
 
-      <div className="flex flex-wrap gap-4 mt-4 pt-4 border-t border-[var(--card-border)]">
+      {/* Legend */}
+      <div className="flex gap-4 mt-2 pt-2 border-t border-[var(--card-border)] shrink-0">
         <div className="flex items-center gap-2">
-          <div className="px-2 py-0.5 rounded text-[10px] font-medium bg-[var(--accent-home)] text-white">WFH</div>
-          <span className="text-sm text-gray-400">Work from Home</span>
+          <div className="px-2 py-0.5 rounded text-[9px] md:text-[10px] font-medium bg-[var(--accent-home)] text-white">WFH</div>
+          <span className="text-xs text-gray-400">Work from Home</span>
         </div>
         <div className="flex items-center gap-2">
-          <div className="px-2 py-0.5 rounded text-[10px] font-medium bg-[var(--accent-office)] text-white">Office</div>
-          <span className="text-sm text-gray-400">Work from Office</span>
+          <div className="px-2 py-0.5 rounded text-[9px] md:text-[10px] font-medium bg-[var(--accent-office)] text-white">Office</div>
+          <span className="text-xs text-gray-400">Work from Office</span>
         </div>
       </div>
     </div>

@@ -2,13 +2,13 @@ import { MonthlyCalendar } from '@/components';
 
 export default function Home() {
   return (
-    <div className="min-h-screen p-4 md:p-8">
-      <header className="max-w-4xl mx-auto mb-8">
-        <h1 className="text-2xl md:text-3xl font-bold">Working From</h1>
-        <p className="text-gray-400 mt-1">Plan your work schedule</p>
+    <div className="h-screen flex flex-col p-3 md:p-4 overflow-hidden">
+      <header className="shrink-0 mb-3">
+        <h1 className="text-xl md:text-2xl font-bold">Working From</h1>
+        <p className="text-gray-400 text-sm">Plan your work schedule</p>
       </header>
 
-      <main className="max-w-4xl mx-auto">
+      <main className="flex-1 min-h-0">
         <MonthlyCalendar />
       </main>
     </div>
